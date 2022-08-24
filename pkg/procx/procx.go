@@ -3,6 +3,7 @@ package procx
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -41,6 +42,9 @@ func Procx(args []string) (io.Reader, error) {
 		err.WriteString(err.String())
 		err.WriteString(out.String())
 		return nil, errors.New(err.String())
+	}
+	if len(err.Bytes()) > 0 {
+		fmt.Fprint(os.Stderr, err.String())
 	}
 	if out.Len() == 0 {
 		return nil, ErrNoData

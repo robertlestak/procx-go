@@ -12,15 +12,30 @@ var (
 	ErrNoData = errors.New("no data")
 )
 
+func findExec(name string) (string, error) {
+	path, err := exec.LookPath(name)
+	if err != nil {
+		return "", err
+	}
+	if path == "" {
+		path = "/usr/local/bin/" + name
+	}
+	return path, nil
+}
+
 func Procx(args []string) (io.Reader, error) {
-	cmd := exec.Command("procx", args...)
+	path, e := findExec("procx")
+	if e != nil {
+		return nil, e
+	}
+	cmd := exec.Command(path, args...)
 	cmd.Env = os.Environ()
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	var err bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &err
-	e := cmd.Run()
+	e = cmd.Run()
 	if e != nil {
 		var err bytes.Buffer
 		err.WriteString(err.String())
